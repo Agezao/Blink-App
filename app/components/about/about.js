@@ -7,6 +7,7 @@ import MenuStyles from '../../assets/styles/menu';
 
 export default class About extends React.Component {
   static navigationOptions = {
+    lockMode: 'locked-closed',
     drawerLabel: 'About',
     drawerIcon: ({ tintColor }) => (
       <Icon name="about" />

@@ -8,6 +8,7 @@ import MarketSummary from '../market/summary';
 
 export default class Home extends React.Component {
   static navigationOptions = {
+    lockMode: 'locked-closed',
     drawerLabel: 'Market',
     drawerIcon: ({ tintColor }) => (
       <Icon name="products" />

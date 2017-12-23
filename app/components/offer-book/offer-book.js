@@ -19,6 +19,7 @@ const OfferBookNavigator = TabNavigator({
 
 export default class OfferBook extends React.Component {
   static navigationOptions = {
+    lockMode: 'locked-closed',
     drawerLabel: 'Offer Book',
     drawerIcon: ({ tintColor }) => (
       <Icon name="books" />

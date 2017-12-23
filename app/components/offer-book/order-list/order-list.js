@@ -32,14 +32,30 @@ class OrderList extends React.Component {
     this._blinktradeService.orderbook()
       .then(data => {
         
+        let ordersMap = [];
+
+        //list.slice(0, size)
         if(this.props.side === 'buy')
-          this.setState({orders: data.bids});
+          ordersMap =  this._orderedMarketList(data.bids, true);
         if(this.props.side === 'sell')
-          this.setState({orders: data.asks});
+          ordersMap = this._orderedMarketList(data.asks);
+
+        this.setState({orders: ordersMap.slice(0, 100)});
       })
       .catch(err => {
         console.log(err);
       });
+  }
+
+  _orderedMarketList(orders, reverse) {
+    var sortRule = function(a, b) {
+      if(reverse)
+        return b[0] - a[0];
+      
+      return  a[0] - b[0];
+    }
+
+    return orders.sort(sortRule);
   }
 
   render() {
