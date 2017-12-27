@@ -73,6 +73,17 @@ class OrderList extends React.Component {
       this.setState({orders: book.MDFullGrp.BTCBRL.asks});
   }
 
+  _orderedMarketList(orders, reverse) {
+    var sortRule = function(a, b) {
+      if(reverse)
+        return b[0] - a[0];
+      
+      return  a[0] - b[0];
+    }
+
+    return orders.sort(sortRule);
+  }
+
   render() {
     let renderOrder = (item) => {
       
