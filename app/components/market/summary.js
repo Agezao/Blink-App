@@ -12,35 +12,30 @@ export default class MarketSummary extends React.Component {
     latest: 0
   };
 
-  _tickerUpdater = null;
   _blinktradeService = new BlinkTradeService();
-  //  blinktrade = new Blinktrade.BlinkTradeWS({ url: 'wss://ws.blinktrade.com/trade/', prod: true, currency: "BRL", brokerId: 4, fingerPrint: '1828918279' });
-  //  blinktrade = new Blinktrade.BlinkTradeRest({ prod: true, currency: "BRL", brokerId: 4 });
 
-  componentDidMount() {
-    let that = this;
-    this._tickerUpdater = setInterval(function() { that._fetchMarket(); }, 2500);
+  componentDidMount() { 
+    this._fetchMarket();
   }
 
   componentWillUnmount() {
-    clearInterval(this._tickerUpdater);
-    this._tickerUpdater = null;
+    this._blinktradeService.ticker(true);
   }
 
   _fetchMarket() {
     let that = this;
 
+    if(!this._blinktradeService.isConnected())
+      return setTimeout(function() { that._fetchMarket(); }, 50);
+
     this._blinktradeService.ticker()
-      .then(data => {
+      .on("BLINK:BTCBRL", function(symbol) {
         let mState = {};
-        mState.high = data.high.toFixed(2);
-        mState.low = data.low.toFixed(2);
-        mState.last = data.last.toFixed(2);
+        mState.high = symbol.HighPx.toFixed(2);
+        mState.low = symbol.LowPx.toFixed(2);
+        mState.last = symbol.LastPx.toFixed(2);
 
         that.setState(mState);
-      })
-      .catch(err => {
-        console.log(err);
       });
   }
 

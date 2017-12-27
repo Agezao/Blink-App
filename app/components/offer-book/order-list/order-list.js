@@ -11,35 +11,66 @@ class OrderList extends React.Component {
     orders: []
   };
 
-  _orderbookUpdater = null;
   _blinktradeService = new BlinkTradeService();
-  //  blinktrade = new Blinktrade.BlinkTradeWS({ url: 'wss://ws.blinktrade.com/trade/', prod: true, currency: "BRL", brokerId: 4, fingerPrint: '1828918279' });
-  //  blinktrade = new Blinktrade.BlinkTradeRest({ prod: true, currency: "BRL", brokerId: 4 });
 
   componentDidMount() {
-    let that = this;
-    this._orderbookUpdater = setInterval(function() { that._fetchOrderbook(); }, 2500);
+    this._fetchOrderbook();
   }
 
   componentWillUnmount() {
-    clearInterval(this._orderbookUpdater);
-    this._orderbookUpdater = null;
+    this._blinktradeService.orderbook(true);
   }
 
   _fetchOrderbook() {
     let that = this;
 
-    this._blinktradeService.orderbook()
-      .then(data => {
-        
-        if(this.props.side === 'buy')
-          this.setState({orders: data.bids});
-        if(this.props.side === 'sell')
-          this.setState({orders: data.asks});
+    let ob = this._blinktradeService.orderbook();
+    ob.on("OB:NEW_ORDER", function(order){
+        if(order.side != that.props.side)
+          return false;
+
+        let book = Object.assign([], that.state.orders);
+        book.splice(order.index - 1, 0, [order.price, order.size]);
+        that.setState({orders: book});
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .then(function(book) { that._updateOrders(book); });
+    //
+    ob.on("OB:UPDATE_ORDER", function(order){ 
+        if(order.side != that.props.side)
+          return false;
+
+        let book = Object.assign([], that.state.orders);
+        book[order.index - 1] = [order.price, order.size];
+        that.setState({orders: book});
+      })
+      .then(function(book) { that._updateOrders(book); });
+    //
+    ob.on("OB:DELETE_ORDER", function(order){
+        if(order.side != that.props.side)
+          return false;
+
+        let book = Object.assign([], that.state.orders);
+        book.splice(order.index - 1, 1);
+        that.setState({orders: book});
+      })
+      .then(function(book) { that._updateOrders(book); });
+    //
+    ob.on("OB:DELETE_ORDERS_THRU", function(order) {
+        if(order.side != that.props.side)
+          return false;
+
+        let book = Object.assign([], that.state.orders);
+        book.splice(order.index - 1, 1);
+        that.setState({orders: book});
+      })
+      .then(function(book) { that._updateOrders(book); });
+  }
+
+  _updateOrders(book) {
+    if(this.props.side === 'buy')
+      this.setState({orders: book.MDFullGrp.BTCBRL.bids});
+    if(this.props.side === 'sell')
+      this.setState({orders: book.MDFullGrp.BTCBRL.asks});
   }
 
   render() {
