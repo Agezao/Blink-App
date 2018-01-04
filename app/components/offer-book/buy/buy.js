@@ -9,9 +9,9 @@ export default class Buy extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.orderPlacer}>
+        {/*<View style={styles.orderPlacer}>
           <PlaceOrder side="buy" />
-        </View>
+        </View>*/}
         <View style={styles.offerList}>
           <OrderList side="buy" />
         </View>

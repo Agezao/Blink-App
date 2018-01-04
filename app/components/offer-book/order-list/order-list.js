@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, Image, Text, View, FlatList } from 'react-native';
 import { ListView, Row, Card, Screen, Caption, Spinner } from '@shoutem/ui';
 //
-import BlinkTradeService from '../../../services/blinktrade.service';
+//import BlinkTradeService from '../../../services/blinktrade.service';
+import OfferbookStore from '../../../stores/offerbook.store';
 import Loader from '../../utils/loader';
 
 class OrderList extends React.Component {
@@ -11,59 +12,30 @@ class OrderList extends React.Component {
     orders: []
   };
 
-  _blinktradeService = new BlinkTradeService();
+  watcher = null;
+
+  reboot = 0;
+
+  //_blinktradeService = new BlinkTradeService();
+  _offerbookStore = new OfferbookStore();
 
   componentDidMount() {
-    this._fetchOrderbook();
+    let that = this;
+    this.watcher = setInterval(function(){ that._fetchOrderbook(that); }, 1000);
   }
 
   componentWillUnmount() {
-    this._blinktradeService.orderbook(true);
+    this._offerbookStore.dispose();
+    clearInterval(this.watcher);
+    this.watcher = null;
   }
 
   _fetchOrderbook() {
-    let that = this;
+    if(!this._offerbookStore.hasUpdates())
+      return false;
 
-    let ob = this._blinktradeService.orderbook();
-    ob.on("OB:NEW_ORDER", function(order){
-        if(order.side != that.props.side)
-          return false;
-
-        let book = Object.assign([], that.state.orders);
-        book.splice(order.index - 1, 0, [order.price, order.size]);
-        that.setState({orders: book});
-      })
-      .then(function(book) { that._updateOrders(book); });
-    //
-    ob.on("OB:UPDATE_ORDER", function(order){ 
-        if(order.side != that.props.side)
-          return false;
-
-        let book = Object.assign([], that.state.orders);
-        book[order.index - 1] = [order.price, order.size];
-        that.setState({orders: book});
-      })
-      .then(function(book) { that._updateOrders(book); });
-    //
-    ob.on("OB:DELETE_ORDER", function(order){
-        if(order.side != that.props.side)
-          return false;
-
-        let book = Object.assign([], that.state.orders);
-        book.splice(order.index - 1, 1);
-        that.setState({orders: book});
-      })
-      .then(function(book) { that._updateOrders(book); });
-    //
-    ob.on("OB:DELETE_ORDERS_THRU", function(order) {
-        if(order.side != that.props.side)
-          return false;
-
-        let book = Object.assign([], that.state.orders);
-        book.splice(order.index - 1, 1);
-        that.setState({orders: book});
-      })
-      .then(function(book) { that._updateOrders(book); });
+    let book = Object.assign([], this._offerbookStore.get(this.props.side));
+    this.setState({orders: book.splice(0,150)});
   }
 
   _updateOrders(book) {
@@ -71,17 +43,6 @@ class OrderList extends React.Component {
       this.setState({orders: book.MDFullGrp.BTCBRL.bids});
     if(this.props.side === 'sell')
       this.setState({orders: book.MDFullGrp.BTCBRL.asks});
-  }
-
-  _orderedMarketList(orders, reverse) {
-    var sortRule = function(a, b) {
-      if(reverse)
-        return b[0] - a[0];
-      
-      return  a[0] - b[0];
-    }
-
-    return orders.sort(sortRule);
   }
 
   render() {

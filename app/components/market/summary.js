@@ -43,10 +43,10 @@ export default class MarketSummary extends React.Component {
     return (
       <View style={styles.container}>
         { this.state.last ? 
-          <View>
-            <Text>Latest: { this.state.last }</Text>
-            <Text>High: { this.state.high }</Text>
-            <Text>Low: { this.state.low }</Text>
+          <View style={styles.valuesHolder}>
+            <Text>🕐 { this.state.last }</Text>
+            <Text>🔺 { this.state.high }</Text>
+            <Text>🔻 { this.state.low }</Text>
           </View>
           : <Loader />}
       </View>
@@ -59,4 +59,12 @@ const styles = StyleSheet.create({
     //flex: 1,
     backgroundColor: '#fff'
   },
+  valuesHolder: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 5,
+    paddingTop: 10,
+    paddingBottom: 10,
+  }
 });

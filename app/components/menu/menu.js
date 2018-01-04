@@ -7,32 +7,6 @@ class Menu extends React.Component {
 
   render(){
     return(
-      /*<View style={styles.menu}>
-        <Button
-          style={styles.title}
-          onPress={() => this.props.navigation.navigate('DrawerToggle')}>
-          <Image
-            source={require('../../assets/icons/menu.png')}
-            style={styles.hamburguer} />
-        </Button>
-        <Text style={styles.title}>{ this.props.title }</Text>
-        <Text style={{opacity: 0}}>{ this.props.title }</Text>
-      </View>*/
-      /*
-        <NavigationBar
-          leftComponent={(
-            <Button>
-              <Icon name="sidebar" onPress={() => this.props.navigation.navigate('DrawerToggle')} />
-            </Button>
-          )}
-          centerComponent={<Title>{ this.props.title }</Title>}
-          rightComponent={(
-            <Button>
-              <Icon name="cart" />
-            </Button>
-          )}
-        />
-      */
       <View style={{ height: 70 }}>
         <NavigationBar
           leftComponent={(

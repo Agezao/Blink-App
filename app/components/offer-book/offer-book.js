@@ -5,6 +5,7 @@ import { Icon, Screen } from '@shoutem/ui';
 //
 import Menu from '../menu/menu';
 import MenuStyles from '../../assets/styles/menu';
+import MarketSummary from '../market/summary';
 
 ///////////////
 // Setting tabs
@@ -31,6 +32,7 @@ export default class OfferBook extends React.Component {
     return (
       <Screen style={styles.container}>
         <Menu navigation={this.props.navigation} title="Offer Book" />
+        <MarketSummary />
         <OfferBookNavigator />
       </Screen>
     );
